@@ -2,6 +2,7 @@ package com.example.alarmproject;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import android.app.AlarmManager;
@@ -22,10 +23,10 @@ public class MainActivity extends AppCompatActivity
     TimePicker alarmTimePicker;
     TimePicker alarmTimePicker2;
     TextView text;
+    Intent intent;
     PendingIntent pendingIntent;
     AlarmManager alarmManager;
     Random rand;
-    RingtonePointer ringtonePointer = new RingtonePointer();
 
     public int getTimeCode(int h, int m){
         return h*60 + m;
@@ -38,14 +39,15 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         alarmTimePicker = (TimePicker) findViewById(R.id.timePicker);
         alarmTimePicker2 = (TimePicker) findViewById(R.id.timePicker2);
-        alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         text = (TextView) findViewById(R.id.textView);
     }
     public void OnToggleClicked(View view)
     {
         long time;
 
-        if (((ToggleButton) view).isChecked()) {
+        if (((ToggleButton) view).isChecked())
+        {
             Toast.makeText(MainActivity.this, "ALARM ON", Toast.LENGTH_SHORT).show();
             Calendar calendar = Calendar.getInstance();
 
@@ -77,8 +79,8 @@ public class MainActivity extends AppCompatActivity
             calendar.set(Calendar.HOUR_OF_DAY, randomH);
             calendar.set(Calendar.MINUTE, randomM);
 
-            Intent intent = new Intent(this, AlarmReceiver.class);
-            pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+            intent = new Intent(this, AlarmReceiver.class);
+            pendingIntent = PendingIntent.getBroadcast(this, 100, intent, 0);
 
             time=(calendar.getTimeInMillis()-(calendar.getTimeInMillis()%60000));
             if(System.currentTimeMillis()>time)
@@ -88,17 +90,17 @@ public class MainActivity extends AppCompatActivity
                 else
                     time = time + (1000*60*60*24);
             }
+
             alarmManager.set(AlarmManager.RTC_WAKEUP, time, pendingIntent);
         }
-        else {
-            alarmManager.cancel(pendingIntent);
+        else
+        {
+            AlarmManager alarmManager2 = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            PendingIntent pendingIntent2 = PendingIntent.getBroadcast(this, 100, intent,PendingIntent.FLAG_CANCEL_CURRENT);
 
-            if (ringtonePointer.playing) {
-                ringtonePointer.stop();
-                Toast.makeText(MainActivity.this, "Good morning!", Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(MainActivity.this, "ALARM OFF", Toast.LENGTH_SHORT).show();
-            }
+            alarmManager2.cancel(pendingIntent2);
+            Toast.makeText(MainActivity.this, "ALARM OFF", Toast.LENGTH_SHORT).show();
         }
+
     }
 }
