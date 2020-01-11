@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity
     PendingIntent pendingIntent;
     AlarmManager alarmManager;
     Random rand;
+    RingtonePointer ringtonePointer = new RingtonePointer();
 
     public int getTimeCode(int h, int m){
         return h*60 + m;
@@ -44,8 +45,7 @@ public class MainActivity extends AppCompatActivity
     {
         long time;
 
-        if (((ToggleButton) view).isChecked())
-        {
+        if (((ToggleButton) view).isChecked()) {
             Toast.makeText(MainActivity.this, "ALARM ON", Toast.LENGTH_SHORT).show();
             Calendar calendar = Calendar.getInstance();
 
@@ -88,12 +88,17 @@ public class MainActivity extends AppCompatActivity
                 else
                     time = time + (1000*60*60*24);
             }
-            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, time, 10000, pendingIntent);
+            alarmManager.set(AlarmManager.RTC_WAKEUP, time, pendingIntent);
         }
-        else
-        {
+        else {
             alarmManager.cancel(pendingIntent);
-            Toast.makeText(MainActivity.this, "ALARM OFF", Toast.LENGTH_SHORT).show();
+
+            if (ringtonePointer.playing) {
+                ringtonePointer.stop();
+                Toast.makeText(MainActivity.this, "Good morning!", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(MainActivity.this, "ALARM OFF", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }
