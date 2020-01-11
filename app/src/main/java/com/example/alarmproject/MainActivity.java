@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity
             if(endTimeCode < startTimeCode) endTimeCode += 1440; //add a day if the endTime < startTime
 
             Random rand = new Random();
-            int rnd = rand.nextInt(endTimeCode-startTimeCode) + startTimeCode;
+            int rnd = rand.nextInt(endTimeCode-startTimeCode+1) + startTimeCode;
 
 
             //int randomNum = ThreadLocalRandom.current().nextInt(min, max + 1);

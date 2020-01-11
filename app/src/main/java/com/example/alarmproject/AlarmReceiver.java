@@ -53,6 +53,7 @@ public class AlarmReceiver extends BroadcastReceiver {
             notificationChannel.setLightColor(Color.GREEN);
             notificationChannel.setVibrationPattern(new long[]{0, 500, 200, 500});
             notificationChannel.enableVibration(true);
+            notificationChannel.setImportance(NotificationCompat.PRIORITY_MAX);
             notificationManager.createNotificationChannel(notificationChannel);
         }
 
