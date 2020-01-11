@@ -8,9 +8,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.widget.Toast;
 
-public class AlarmReceiver extends BroadcastReceiver
-{
-    private static Ringtone ringtone = null;
+public class AlarmReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent)
@@ -21,15 +19,10 @@ public class AlarmReceiver extends BroadcastReceiver
         {
             alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         }
-        ringtone = RingtoneManager.getRingtone(context, alarmUri);
-        ringtone.play();
-    }
 
-    public static void stopRingTone()
-    {
-        //ringtone.play();
-        ringtone.stop();
+        RingtonePointer ringtonePointer = new RingtonePointer();
+        ringtonePointer.ringtone = RingtoneManager.getRingtone(context, alarmUri);
+        ringtonePointer.play();
     }
-
 
 }
