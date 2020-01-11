@@ -11,14 +11,20 @@ import android.view.View;
 import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+import android.widget.TextView;
 
+import java.util.Random;
 import java.util.Calendar;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class MainActivity extends AppCompatActivity
 {
     TimePicker alarmTimePicker;
+    TimePicker alarmTimePicker2;
+    TextView text;
     PendingIntent pendingIntent;
     AlarmManager alarmManager;
+    Random rand;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -26,17 +32,35 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         alarmTimePicker = (TimePicker) findViewById(R.id.timePicker);
+        alarmTimePicker2 = (TimePicker) findViewById(R.id.timePicker2);
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        text = (TextView) findViewById(R.id.textView);
     }
     public void OnToggleClicked(View view)
     {
         long time;
+
         if (((ToggleButton) view).isChecked())
         {
             Toast.makeText(MainActivity.this, "ALARM ON", Toast.LENGTH_SHORT).show();
             Calendar calendar = Calendar.getInstance();
-            calendar.set(Calendar.HOUR_OF_DAY, alarmTimePicker.getCurrentHour());
-            calendar.set(Calendar.MINUTE, alarmTimePicker.getCurrentMinute());
+
+            int startH = alarmTimePicker.getCurrentHour();      //both ints
+            int startM = alarmTimePicker.getCurrentMinute();
+            int endH = alarmTimePicker2.getCurrentHour();
+            int endM = alarmTimePicker2.getCurrentMinute();
+            //int randomNum = ThreadLocalRandom.current().nextInt(min, max + 1);
+            int randomH = ThreadLocalRandom.current().nextInt(startH, endH + 1);
+            int randomM = ThreadLocalRandom.current().nextInt(startM, endM + 1);
+
+            text.setText("Hour: " + randomH + " Minute: " + randomM);
+
+            //calendar.set(Calendar.HOUR_OF_DAY, alarmTimePicker.getCurrentHour());
+            //calendar.set(Calendar.MINUTE, alarmTimePicker.getCurrentMinute());
+
+            calendar.set(Calendar.HOUR_OF_DAY, randomH);
+            calendar.set(Calendar.MINUTE, randomM);
+
             Intent intent = new Intent(this, AlarmReceiver.class);
             pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
 

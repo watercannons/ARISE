@@ -7,22 +7,30 @@
     <TimePicker
         android:id="@+id/timePicker"
         android:layout_width="wrap_content"
-        android:layout_height="338dp"
-        android:layout_gravity="center" />
+        android:layout_height="240dp"
+        android:layout_gravity="center"
+        android:timePickerMode="spinner" />
 
     <TimePicker
         android:id="@+id/timePicker2"
         android:layout_width="wrap_content"
-        android:layout_height="333dp"
-        android:layout_gravity="center" />
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:timePickerMode="spinner" />
 
     <ToggleButton
         android:id="@+id/toggleButton"
         android:layout_width="wrap_content"
-        android:layout_height="48dp"
+        android:layout_height="45dp"
         android:layout_gravity="center"
         android:layout_margin="20dp"
         android:checked="false"
         android:onClick="OnToggleClicked" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="TextView" />
 
 </LinearLayout>
