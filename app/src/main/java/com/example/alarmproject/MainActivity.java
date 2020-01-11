@@ -26,6 +26,10 @@ public class MainActivity extends AppCompatActivity
     AlarmManager alarmManager;
     Random rand;
 
+    public int getTimeCode(int h, int m){
+        return h*60 + m;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -49,9 +53,21 @@ public class MainActivity extends AppCompatActivity
             int startM = alarmTimePicker.getCurrentMinute();
             int endH = alarmTimePicker2.getCurrentHour();
             int endM = alarmTimePicker2.getCurrentMinute();
+
+            int startTimeCode = getTimeCode(startH, startM);
+            int endTimeCode = getTimeCode(endH,endM);
+
+            if(endTimeCode < startTimeCode) endTimeCode += 1440; //add a day if the endTime < startTime
+
+            Random rand = new Random();
+            int rnd = rand.nextInt(endTimeCode-startTimeCode) + startTimeCode;
+
+
             //int randomNum = ThreadLocalRandom.current().nextInt(min, max + 1);
-            int randomH = ThreadLocalRandom.current().nextInt(startH, endH + 1);
-            int randomM = ThreadLocalRandom.current().nextInt(startM, endM + 1);
+            int randomH = rnd/60;
+            int randomM = rnd%60;
+
+            if(randomH > 23) randomH-=24; //in case when the hours was > 24, subtract a day
 
             text.setText("Hour: " + randomH + " Minute: " + randomM);
 
