@@ -100,8 +100,6 @@ public class MainActivity extends AppCompatActivity {
 
             add(startTimeCode, endTimeCode);
 
-            disable(1670);
-
         }
         else {
             alarmManager.cancel(pendingIntent);
@@ -182,6 +180,9 @@ public class MainActivity extends AppCompatActivity {
 
         new_file = _FILE_ + new_line;
 
+        while (new_file.indexOf("null") != -1)
+            new_file = new_file.substring(0, new_file.indexOf("null")) + new_file.substring(new_file.indexOf("null")+4);
+
 
 
         try {
@@ -200,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        Toast.makeText(this, "save",  Toast.LENGTH_LONG).show();
+//        Toast.makeText(this, "save",  Toast.LENGTH_LONG).show();
 
 
     }
@@ -290,7 +291,7 @@ public class MainActivity extends AppCompatActivity {
         String s1 = _FILE_.substring(0, _FILE_.indexOf(ID+""));
         String s2 = _FILE_.substring( _FILE_.indexOf(ID+"") + _FILE_.substring(_FILE_.indexOf(ID+"")).indexOf('\n')-1 );
 
-        new_file = s1 + ":" + start_time + ":" + end_time + ":" + s2;
+        new_file = s1 + ID+ ":" + start_time + ":" + end_time + ":" + s2;
 
 
         try {
