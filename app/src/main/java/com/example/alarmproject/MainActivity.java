@@ -8,6 +8,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -25,6 +26,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class MainActivity extends AppCompatActivity {
     private static final String FILE_NAME = "alarms.arise";
+    private static String _FILE_;
     TimePicker alarmTimePicker;
     TimePicker alarmTimePicker2;
     TextView text;
@@ -34,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
     public int getID(int start_time, int end_time) {return (int)(Math.random() * (7*(start_time+123) + 3*(end_time+456)));}
 
-    public int getTimeCode(int h, int m){return h*60 + m;}
+    public int getTimeCode(int h, int m) {return h*60 + m;}
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +46,10 @@ public class MainActivity extends AppCompatActivity {
         alarmTimePicker2 = (TimePicker) findViewById(R.id.timePicker2);
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         text = (TextView) findViewById(R.id.textView);
+        Toast.makeText(this, "hello",  Toast.LENGTH_LONG).show();
+        load();
     }
+
     public void OnToggleClicked(View view) {
         long time;
 
@@ -93,7 +98,9 @@ public class MainActivity extends AppCompatActivity {
             }
             alarmManager.set(AlarmManager.RTC_WAKEUP, time, pendingIntent);
 
-            save(startTimeCode, endTimeCode);
+            add(startTimeCode, endTimeCode);
+
+            disable(1670);
 
         }
         else {
@@ -108,11 +115,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void save(int start_time, int end_time) {
 
-        String new_line = getID(start_time,end_time) + ":" +start_time + ":" + end_time + "\n";
-        String new_file = "";
-        FileOutputStream FOS = null;
+
+    private void load() {
         FileInputStream FIS = null;
 
         try {
@@ -129,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
                 SB.append(FIS_in).append("\n");
             }
 
-            new_file = SB.toString();
+            _FILE_ = SB.toString();
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -140,14 +145,22 @@ public class MainActivity extends AppCompatActivity {
                 try {FIS.close();} catch (IOException e) {e.printStackTrace();}
             }
         }
+    }
+    public void delete(int ID) {
 
-        new_file += new_line;
+        if (_FILE_.indexOf(ID+"") == -1) return;
+
+        String new_file = "";
+        FileOutputStream FOS = null;
+
+
+        new_file = _FILE_.substring(0,_FILE_.indexOf(ID+"")) + _FILE_.substring( _FILE_.indexOf(ID+"") + _FILE_.substring(_FILE_.indexOf(ID+"")).indexOf('\n') + 1);
+
 
         try {
             FOS = openFileOutput(FILE_NAME, MODE_PRIVATE);
             FOS.write(new_file.getBytes());
-
-//            Toast.makeText(this, "Saved to " + getFilesDir() + "/" + FILE_NAME,  Toast.LENGTH_LONG).show();
+            _FILE_ = new_file;
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -161,6 +174,140 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+    public void add(int start_time, int end_time) {
 
+        String new_line = getID(start_time,end_time) + ":" +start_time + ":" + end_time + ":" + "T" + "\n";
+        String new_file = "";
+        FileOutputStream FOS = null;
+
+        new_file = _FILE_ + new_line;
+
+
+
+        try {
+            FOS = openFileOutput(FILE_NAME, MODE_PRIVATE);
+            FOS.write(new_file.getBytes());
+            _FILE_ = new_file;
+
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (FOS != null) {
+                try {FOS.close();} catch (IOException e) {e.printStackTrace();}
+            }
+        }
+
+        Toast.makeText(this, "save",  Toast.LENGTH_LONG).show();
+
+
+    }
+
+    public int get_enabled(int ID) {
+        if (_FILE_.indexOf(ID+"") == -1) return -1;
+        else if (_FILE_.charAt(_FILE_.indexOf(ID+"") + _FILE_.substring(_FILE_.indexOf(ID+"")).indexOf('\n')-1) == 'T')
+            return 1;
+        else
+            return 0;
+    }
+    public void enable(int ID) {
+        if (_FILE_.indexOf(ID+"") == -1) return;
+
+        String new_file = "";
+        FileOutputStream FOS = null;
+
+
+        new_file = _FILE_.substring(0,_FILE_.indexOf(ID+"") +  _FILE_.substring(_FILE_.indexOf(ID+"")).indexOf('\n')-1 ) + "T" +
+                _FILE_.substring(_FILE_.indexOf(ID+"") + _FILE_.substring(_FILE_.indexOf(ID+"")).indexOf('\n'));
+
+
+        try {
+            FOS = openFileOutput(FILE_NAME, MODE_PRIVATE);
+            FOS.write(new_file.getBytes());
+            _FILE_ = new_file;
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (FOS != null) {
+                try {FOS.close();} catch (IOException e) {e.printStackTrace();}
+            }
+        }
+    }
+    public void disable(int ID) {
+        if (_FILE_.indexOf(ID+"") == -1) return;
+
+        String new_file = "";
+        FileOutputStream FOS = null;
+
+
+        new_file = _FILE_.substring(0,_FILE_.indexOf(ID+"") +  _FILE_.substring(_FILE_.indexOf(ID+"")).indexOf('\n')-1 ) + "f" +
+                _FILE_.substring(_FILE_.indexOf(ID+"") + _FILE_.substring(_FILE_.indexOf(ID+"")).indexOf('\n'));
+
+
+        try {
+            FOS = openFileOutput(FILE_NAME, MODE_PRIVATE);
+            FOS.write(new_file.getBytes());
+            _FILE_ = new_file;
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (FOS != null) {
+                try {FOS.close();} catch (IOException e) {e.printStackTrace();}
+            }
+        }
+    }
+
+    public int get_start_time(int ID) {
+        if (_FILE_.indexOf(ID+"") == -1) return -1;
+        String s = _FILE_.substring(_FILE_.indexOf(ID+""));
+        s = s.substring(s.indexOf(":")+1);
+        s = s.substring(0, s.indexOf(":"));
+        return Integer.parseInt(s);
+    }
+    public int get_end_time(int ID) {
+        if (_FILE_.indexOf(ID+"") == -1) return -1;
+        String s = _FILE_.substring(_FILE_.indexOf(ID+""));
+        s = s.substring(s.indexOf(":")+1);
+        s = s.substring(s.indexOf(":")+1);
+        s = s.substring(0, s.indexOf(":"));
+        return Integer.parseInt(s);
+    }
+    public void update(int ID, int start_time, int end_time) {
+
+        if (_FILE_.indexOf(ID+"") == -1) return;
+
+        String new_file = "";
+        FileOutputStream FOS = null;
+
+        String s1 = _FILE_.substring(0, _FILE_.indexOf(ID+""));
+        String s2 = _FILE_.substring( _FILE_.indexOf(ID+"") + _FILE_.substring(_FILE_.indexOf(ID+"")).indexOf('\n')-1 );
+
+        new_file = s1 + ":" + start_time + ":" + end_time + ":" + s2;
+
+
+        try {
+            FOS = openFileOutput(FILE_NAME, MODE_PRIVATE);
+            FOS.write(new_file.getBytes());
+            _FILE_ = new_file;
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (FOS != null) {
+                try {FOS.close();} catch (IOException e) {e.printStackTrace();}
+            }
+        }
+
+    }
 
 }
