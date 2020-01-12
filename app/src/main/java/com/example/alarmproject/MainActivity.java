@@ -13,27 +13,31 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 import android.widget.TextView;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Random;
 import java.util.Calendar;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class MainActivity extends AppCompatActivity
-{
+public class MainActivity extends AppCompatActivity {
+    private static final String FILE_NAME = "alarms.arise";
     TimePicker alarmTimePicker;
     TimePicker alarmTimePicker2;
     TextView text;
     PendingIntent pendingIntent;
     AlarmManager alarmManager;
-    Random rand;
     RingtonePointer ringtonePointer = new RingtonePointer();
 
-    public int getTimeCode(int h, int m){
-        return h*60 + m;
-    }
+    public int getID(int start_time, int end_time) {return (int)(Math.random() * (7*(start_time+123) + 3*(end_time+456)));}
+
+    public int getTimeCode(int h, int m){return h*60 + m;}
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         alarmTimePicker = (TimePicker) findViewById(R.id.timePicker);
@@ -41,8 +45,7 @@ public class MainActivity extends AppCompatActivity
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         text = (TextView) findViewById(R.id.textView);
     }
-    public void OnToggleClicked(View view)
-    {
+    public void OnToggleClicked(View view) {
         long time;
 
         if (((ToggleButton) view).isChecked()) {
@@ -89,6 +92,9 @@ public class MainActivity extends AppCompatActivity
                     time = time + (1000*60*60*24);
             }
             alarmManager.set(AlarmManager.RTC_WAKEUP, time, pendingIntent);
+
+            save(startTimeCode, endTimeCode);
+
         }
         else {
             alarmManager.cancel(pendingIntent);
@@ -101,4 +107,60 @@ public class MainActivity extends AppCompatActivity
             }
         }
     }
+
+    private void save(int start_time, int end_time) {
+
+        String new_line = getID(start_time,end_time) + ":" +start_time + ":" + end_time + "\n";
+        String new_file = "";
+        FileOutputStream FOS = null;
+        FileInputStream FIS = null;
+
+        try {
+            FIS = openFileInput(FILE_NAME);
+//            Toast.makeText(this, "opened",  Toast.LENGTH_LONG).show();
+            InputStreamReader ISR = new InputStreamReader(FIS);
+            BufferedReader BR = new BufferedReader(ISR);
+            StringBuilder SB = new StringBuilder();
+            String FIS_in;
+
+//            Toast.makeText(this, "almost read",  Toast.LENGTH_LONG).show();
+
+            while ((FIS_in = BR.readLine()) != null) {
+                SB.append(FIS_in).append("\n");
+            }
+
+            new_file = SB.toString();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (FIS != null) {
+                try {FIS.close();} catch (IOException e) {e.printStackTrace();}
+            }
+        }
+
+        new_file += new_line;
+
+        try {
+            FOS = openFileOutput(FILE_NAME, MODE_PRIVATE);
+            FOS.write(new_file.getBytes());
+
+//            Toast.makeText(this, "Saved to " + getFilesDir() + "/" + FILE_NAME,  Toast.LENGTH_LONG).show();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (FOS != null) {
+                try {FOS.close();} catch (IOException e) {e.printStackTrace();}
+            }
+        }
+
+
+    }
+
+
 }
